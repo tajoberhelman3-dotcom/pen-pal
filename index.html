@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pen Pal</title>
+<meta name="theme-color" content="#D23A3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pen Pal">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Instrument+Sans:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script src="config.js"></script>
+</head>
+<body>
+<div class="airmail" aria-hidden="true"></div>
+
+<!-- Loading -->
+<div class="wrap" id="loading">
+  <p class="quiet center">Opening the mailbag…</p>
+</div>
+
+<!-- Setup missing -->
+<div class="wrap" id="unconfigured" hidden>
+  <div class="brand"><h1>Pen <span>Pal</span></h1></div>
+  <div class="notice">This copy of Pen Pal isn't connected to its database yet. Fill in <code>config.js</code> (see README).</div>
+</div>
+
+<!-- Onboarding -->
+<div class="wrap" id="onboard" hidden>
+  <div class="brand"><h1>Pen <span>Pal</span></h1><small>par avion</small></div>
+
+  <div class="install" id="installCard" hidden>
+    <strong>Put Pen Pal on your home screen first</strong>
+    <ol>
+      <li>Tap the <b>Share</b> button in Safari (the square with the arrow).</li>
+      <li>Scroll down and tap <b>Add to Home Screen</b>.</li>
+      <li>Open Pen Pal from your home screen and set up there.</li>
+    </ol>
+    <p class="small">Notifications only work from the home-screen app, and the home-screen app keeps its own login, so anything you set up here in Safari won't carry over.</p>
+    <button class="linkbtn" id="skipInstall" type="button">Use it in Safari anyway</button>
+  </div>
+
+  <div class="steps" id="setupSteps">
+    <div class="field">
+      <label class="label" for="nameIn">Your name</label>
+      <input type="text" id="nameIn" maxlength="24" autocomplete="nickname" placeholder="What your pals call you">
+    </div>
+    <div class="split">
+      <div class="panel">
+        <span class="label">Start a crew</span>
+        <input type="text" id="crewNameIn" maxlength="30" placeholder="Crew name (e.g. 13th South)">
+        <button class="btn primary" id="createBtn" type="button">Start crew</button>
+      </div>
+      <div class="panel">
+        <span class="label">Join a crew</span>
+        <input type="text" id="codeIn" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="6-letter code">
+        <button class="btn" id="joinBtn" type="button">Join</button>
+      </div>
+    </div>
+    <p class="error" id="onboardErr" hidden></p>
+  </div>
+  <p class="resp">Hit responsibly. 21+.</p>
+</div>
+
+<!-- Main -->
+<div class="wrap" id="main" hidden>
+  <header>
+    <div class="brand"><h1>Pen <span>Pal</span></h1></div>
+    <div class="out-chip" id="outChip"><i></i><span id="outText">Nobody's out</span></div>
+  </header>
+
+  <div class="send">
+    <button class="stamp" id="stamp" type="button" aria-label="Log a hit and send it to your crew">
+      <span class="big">HIT</span>
+      <span class="sub" id="stampSub">SNAP + SEND</span>
+    </button>
+    <input class="vh" type="file" id="cam" accept="image/*" capture="user" tabindex="-1" aria-hidden="true">
+    <button class="linkbtn quietlink" id="noPic" type="button">Send without a pic</button>
+    <div class="mystats" id="mystats"></div>
+    <div class="controls">
+      <div class="field">
+        <span class="label">What you're hitting</span>
+        <div class="chips" id="pens"></div>
+        <div class="addrow" id="addRow" hidden>
+          <input type="text" id="newPen" maxlength="24" placeholder="Name your pen (e.g. Mango Geek Bar)">
+          <button class="chip" id="savePen" type="button">Add</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="label" for="spot">Where you at (optional)</label>
+        <input type="text" id="spot" maxlength="40" placeholder="Library, the crib, chairlift…">
+      </div>
+    </div>
+  </div>
+
+  <div class="notice action" id="pushCard" hidden>
+    <span id="pushText">Get a buzz when a pal hits.</span>
+    <button class="btn primary small" id="pushBtn" type="button">Turn on notifications</button>
+  </div>
+
+  <section>
+    <h2>Pals out now</h2>
+    <div class="pals" id="pals"></div>
+    <p class="quiet" id="palsEmpty">Nobody's hit in the last 2 hours.</p>
+  </section>
+
+  <section>
+    <h2>Mailbag</h2>
+    <div class="feed" id="feed"></div>
+  </section>
+
+  <section>
+    <h2>Crew</h2>
+    <div class="crewbox">
+      <div>
+        <div class="crewname" id="crewName"></div>
+        <div class="small" id="crewCount"></div>
+      </div>
+      <button class="code" id="codeBtn" type="button" aria-label="Copy invite code"></button>
+    </div>
+    <p class="small">Send your pals the link to this app and the code above. They install it and tap Join.</p>
+    <div class="leave">
+      <button class="linkbtn" id="leaveBtn" type="button">Leave crew</button>
+      <span id="leaveConfirm" hidden>Leave this crew? <button class="linkbtn danger" id="leaveYes" type="button">Leave</button> <button class="linkbtn" id="leaveNo" type="button">Cancel</button></span>
+    </div>
+  </section>
+
+  <p class="resp">Hit responsibly. 21+.</p>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <img id="lightImg" alt="">
+  <div class="lightcap" id="lightCap"></div>
+  <button class="btn small" id="lightClose" type="button">Close</button>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
